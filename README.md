@@ -26,6 +26,7 @@ Run Public Sub GenerateAllAuditDataMacros() in module modDataMacros
 ' STEP 4: Copy 2 functions into each form bound to a table with one or more Long Text fields
           Long Text fields are not auditable with Data Macros, so VBA helper functions are required
 '-----------------------------------------------------------------------------
+
 Copy and paste Public Sub BackupLongTextFields(frm As Form)
 Copy and paste Public Sub BackupLongTextFieldsBeforeDelete(frm As Form)
 
