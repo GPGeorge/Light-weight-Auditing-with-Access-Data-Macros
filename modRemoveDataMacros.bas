@@ -89,7 +89,7 @@ Public Sub ListAllTableProperties()
     
     ' Check the tables you showed in the screenshot
     Dim arrTables As Variant
-    arrTables = Array("tblApprovedKeyWords", "tblBannedKeyWord", "tblBookcase")
+    arrTables = Array("Table1", "Table2", "Tables" [, "other tables"])
     
     Dim i As Integer
     For i = LBound(arrTables) To UBound(arrTables)
@@ -107,76 +107,6 @@ Public Sub ListAllTableProperties()
     
     Debug.Print vbCrLf & "=== End of List ==="
 End Sub
-Public Function RemoveValidFields() As Boolean
-    On Error GoTo ErrorHandler
-    
-    Dim db As DAO.Database
-    Dim tdf As DAO.TableDef
-    Dim fld As DAO.Field
-    Dim strTableName As String
-    Dim intTablesProcessed As Integer
-    Dim intFieldsRemoved As Integer
-    Dim strRemovedFields As String
-    
-    Set db = CurrentDb
-    intTablesProcessed = 0
-    intFieldsRemoved = 0
-    
-    ' Loop through all tables
-    For Each tdf In db.TableDefs
-        ' Skip system and temporary tables
-        If Left(tdf.Name, 4) <> "MSys" And Left(tdf.Name, 1) <> "~" Then
-            strTableName = tdf.Name
-            strRemovedFields = ""
-            
-            ' Try to remove ValidFrom field
-            On Error Resume Next
-            Set fld = tdf.Fields("ValidFrom")
-            If Err.Number = 0 Then
-                tdf.Fields.Delete "ValidFrom"
-                If Err.Number = 0 Then
-                    intFieldsRemoved = intFieldsRemoved + 1
-                    strRemovedFields = "ValidFrom"
-                    Debug.Print strTableName & ": Removed ValidFrom"
-                End If
-            End If
-            Err.Clear
-            
-            ' Try to remove ValidTo field
-            Set fld = tdf.Fields("ValidTo")
-            If Err.Number = 0 Then
-                tdf.Fields.Delete "ValidTo"
-                If Err.Number = 0 Then
-                    intFieldsRemoved = intFieldsRemoved + 1
-                    If strRemovedFields <> "" Then strRemovedFields = strRemovedFields & ", "
-                    strRemovedFields = strRemovedFields & "ValidTo"
-                    Debug.Print strTableName & ": Removed ValidTo"
-                End If
-            End If
-            Err.Clear
-            On Error GoTo ErrorHandler
-            
-            intTablesProcessed = intTablesProcessed + 1
-        End If
-    Next tdf
-    
-    ' Display results
-    Debug.Print vbCrLf & "Processed " & intTablesProcessed & " tables"
-    Debug.Print "Removed " & intFieldsRemoved & " fields total"
-    
-    MsgBox "Successfully processed " & intTablesProcessed & " tables." & vbCrLf & _
-           "Removed " & intFieldsRemoved & " field(s) total.", _
-           vbInformation, "Fields Removed"
-    
-    RemoveValidFields = True
-    Exit Function
-    
-ErrorHandler:
-    Debug.Print "Error in RemoveValidFields: " & Err.Description & " (Table: " & strTableName & ")"
-    MsgBox "Error removing fields: " & Err.Description & vbCrLf & _
-           "Table: " & strTableName, vbExclamation
-    RemoveValidFields = False
-End Function
 
 Public Function FindModernChartControls() As Boolean
     On Error GoTo ErrorHandler
@@ -350,3 +280,4 @@ Function GetFieldTypeName(intType As Integer) As String
         Case Else: GetFieldTypeName = "Type " & intType
     End Select
 End Function
+
