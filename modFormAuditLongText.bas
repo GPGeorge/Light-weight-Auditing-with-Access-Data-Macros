@@ -9,7 +9,7 @@ Option Explicit
 ' These functions backup Long Text field values to tblLongTextBackup
 ' before updates and deletes, so Data Macros can retrieve them via LookupRecord.
 '
-' USAGE IN YOUR FORMS:
+' USAGE IN YOUR FORMS BOUND TO AUDITED TABLES:
 '
 ' In Form_BeforeUpdate event:
 '     Call BackupLongTextFields(Me)
@@ -18,10 +18,11 @@ Option Explicit
 '     Call BackupLongTextFieldsBeforeDelete(Me)
 '=============================================================================
 
-'-----------------------------------------------------------------------------
+'--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ' Call this from Form_BeforeUpdate event
 ' Backs up all Long Text fields before the record is updated
-'-----------------------------------------------------------------------------
+' The data macros can retrieve the values from the backup table and insert them in the audit table.
+'--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Public Sub BackupLongTextFields(frm As Form)
 100       On Error GoTo errHandler
           
@@ -77,7 +78,7 @@ Public Sub BackupLongTextFields(frm As Form)
 440       rsConfig.Close
 
           
-Cleanup:
+CleanUp:
           
 450       On Error Resume Next
 460       Set rsConfig = Nothing
@@ -89,14 +90,15 @@ errHandler:
 500       Call GlblErrMsg( _
               sFrm:=Application.VBE.ActiveCodePane.CodeModule, _
               sCtl:="BackupLongTextFields")
-510       Resume Cleanup
+510       Resume CleanUp
 
 520       Resume
 End Sub
-'-----------------------------------------------------------------------------
+'-----------------------------------------------------------------------------------------------------------------------------------------------------------
 ' Call this from Form_Delete event (NOT BeforeDelConfirm)
 ' Backs up all Long Text fields before the record is deleted
-'-----------------------------------------------------------------------------
+' The data macros can retrieve the values from the backup table and insert them in the audit table.
+'-----------------------------------------------------------------------------------------------------------------------------------------------------------
 Public Sub BackupLongTextFieldsBeforeDelete(frm As Form)
           
 100       On Error GoTo errHandler
@@ -162,7 +164,7 @@ Public Sub BackupLongTextFieldsBeforeDelete(frm As Form)
           
 
           
-Cleanup:
+CleanUp:
           
 480       On Error Resume Next
 490       Exit Sub
@@ -171,7 +173,7 @@ errHandler:
 500       Call GlblErrMsg( _
               sFrm:=Application.VBE.ActiveCodePane.CodeModule, _
               sCtl:="BackupLongTextFieldsBeforeDelete")
-510       Resume Cleanup
+510       Resume CleanUp
 
 520       Resume
 End Sub
