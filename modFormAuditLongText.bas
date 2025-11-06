@@ -16,13 +16,17 @@ Option Explicit
 '
 ' In Form_BeforeDelConfirm event:
 '     Call BackupLongTextFieldsBeforeDelete(Me)
-'=============================================================================
 
 '--------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ' Call this from Form_BeforeUpdate event
 ' Backs up all Long Text fields before the record is updated
-' The data macros can retrieve the values from the backup table and insert them in the audit table.
+' The After Update and After Delete data macros can retrieve the values from the backup table and insert them in the audit table.
+' Compensates for inability to do String Comparisons on .Old and new values in Long Text fields to identify changes
+'   Simply logs all values to Audit Table.
 '--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+'=============================================================================
+
 Public Sub BackupLongTextFields(frm As Form)
 100       On Error GoTo errHandler
           
@@ -95,10 +99,13 @@ errHandler:
 520       Resume
 End Sub
 '-----------------------------------------------------------------------------------------------------------------------------------------------------------
-' Call this from Form_Delete event (NOT BeforeDelConfirm)
+' Call this from Form_Delete event (NOT BeforeDelConfirm or Delete)
 ' Backs up all Long Text fields before the record is deleted
-' The data macros can retrieve the values from the backup table and insert them in the audit table.
-'-----------------------------------------------------------------------------------------------------------------------------------------------------------
+' The After Update and After Delete data macros can retrieve the values from the backup table and insert them in the audit table.
+' Compensates for inability to do String Comparisons on .Old and new values in Long Text fields to identify deletions
+'   Simply logs all values to Audit Table.
+'--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Public Sub BackupLongTextFieldsBeforeDelete(frm As Form)
           
 100       On Error GoTo errHandler
@@ -324,6 +331,7 @@ End Function
 '
 '============================
  
+
 
 
 
