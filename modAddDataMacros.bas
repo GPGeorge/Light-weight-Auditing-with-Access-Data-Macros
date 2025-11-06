@@ -12,7 +12,8 @@ Option Explicit
 '            The main audit table, tblAuditLog, must be created in the BE and CAN be linked to the FE.
 '            The tblLongTextBackup table must be created in the BE and it MUST be linked to the FE
 '              because both the Data Macros in the BE and the VBA in the FE must have read/write access to this table.
-'             The tblDataMacroConfig table must be created in the BE and should not be linked to the FE.
+'             The tblDataMacroConfig table must be created in the BE and MUST be linked to the FE
+'              because both the Data Macros in the BE and the VBA in the FE must have read/write access to this table.
 '
 ' SETUP INSTRUCTIONS:
 '  BACK END Set up
@@ -777,5 +778,6 @@ Dim fld As DAO.Field
     
     GetPrimaryKeyField = ""
 End Function
+
 
 
