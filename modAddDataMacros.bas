@@ -7,18 +7,19 @@ Option Explicit
 '
 ' This module provides a complete auditing solution using Access Data Macros
 ' with special handling for Long Text fields via LookupRecord.
-
-'NOTE: Because data macros are created on tables in the same accdb,
-'             this code must be run in the BE, NOT in the FE.
-
-'            The main audit table, tblAuditLog, must be created in the BE and can be linked to the FE.
-'            The tblLongTextBackup table must be created in the BE and it must be linked to the FE
-'              because both the Data Macros in the BE and the VBA in the FE must have access to this table.
+'NOTE: Because data macros are created on tables in the same accdb, this code must be run in the BE,
+'            not in the FE.
+'            The main audit table, tblAuditLog, must be created in the BE and CAN be linked to the FE.
+'            The tblLongTextBackup table must be created in the BE and it MUST be linked to the FE
+'              because both the Data Macros in the BE and the VBA in the FE must have read/write access to this table.
+'             The tblDataMacroConfig table must be created in the BE and should not be linked to the FE.
 '
 ' SETUP INSTRUCTIONS:
-' 1. Run CreateAuditTables() to create 3 required tables-- tblAuditLog, tblLongTextBackup, and tblDataMacroConfig
-' 2. Run PopulateConfigTable() to populate the config with your tables/fields
+'  BACK END Set up
+' 1. Run CreateAuditTables() to create the 3 required tables- - tblAuditLog, tblLongTextBackup, and tblDataMacroConfig
+' 2. Run PopulateConfigTable() to populate the config with your auditable tables/fields
 ' 3. Run GenerateAllAuditDataMacros() to create all Data Macros
+'  FRONT END Set up
 ' 4. Implement Form VBA (see separate instructions) for Long Text field backup
 '===========================================================================================================
 
@@ -776,4 +777,5 @@ Dim fld As DAO.Field
     
     GetPrimaryKeyField = ""
 End Function
+
 
