@@ -28,6 +28,7 @@ Contains the VBA function called by Data Macros:
 
 This module must exist in BOTH Backend and Frontend because:
 - Backend Data Macros call it during table operations
+- At runtime Data Macros expect it to be available locally
 - Frontend forms can call it if needed for additional coverage
 
 ## Data Macros Generated
