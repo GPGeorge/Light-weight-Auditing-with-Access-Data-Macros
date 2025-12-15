@@ -1,4 +1,7 @@
 Attribute VB_Name = "modAddDataMacrosDM"
+Option Compare Database
+Option Explicit
+
 '=====================================================================================================================
 ' COMPLETE AUDIT DATA MACRO SYSTEM
 '
@@ -955,5 +958,6 @@ Private Function GetPrimaryKeyField(tableName As String) As String
           
 200       GetPrimaryKeyField = ""
 End Function
+
 
 
