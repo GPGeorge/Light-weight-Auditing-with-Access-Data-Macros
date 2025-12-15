@@ -233,15 +233,17 @@ Public Sub Two_PopulateConfigTable()
 130       For Each tdef In db.TableDefs
               ' Filter: Include only tables starting with "tbl"
               ' Exclude: System tables, audit tables, other tables you don't want to audit
-              'This could be implemented as a table driven solution, with all auditable tables and auditable fields flagged
-              'The audit log tables could be prefixed "USys" to avoid hard-coding them here.
-140           If Left(tdef.Name, 3) = "tbl" _
-                  And tdef.Name <> "tblAuditLog" _
-                  And tdef.Name <> "tblLongTextBackup" _
-                  And tdef.Name <> "tblDataMacroConfig" _
-                  And tdef.Name <> "tblLoadTime" _
-                  And tdef.Name <> "tblPublicationHistory" _
-                  And Left(tdef.Name, 7) <> "tblPUTT" Then
+              'This should be implemented as a table driven solution, with all auditable tables and auditable fields flagged or unflagged as appropriate.
+              'The audit log tables could also be prefixed "USys" to avoid hard-coding them here or flagging them in the config table.
+140           If Left(tdef.Name, 3) = "tbl" 
+                    '_
+                  'And tdef.Name <> "tblAuditLog" _
+                  'And tdef.Name <> "tblLongTextBackup" _
+                  'And tdef.Name <> "tblDataMacroConfig" _
+                  'And tdef.Name <> "tblLoadTime" _
+                  'And tdef.Name <> "tblPublicationHistory" _
+                  'And Left(tdef.Name, 7) <> "tblPUTT" 
+Then
                   
                   ' Get primary key field name for this table
 150               pkFieldName = ""
@@ -256,20 +258,20 @@ Public Sub Two_PopulateConfigTable()
 240               Next idx
                   
                   ' Add each field to be audited (excluding specific field names you don't want to audit)
-                  ' Instead of hard-coding excluded fields, this could be modified to add all fields.
-                  ' Then, an additional "IsAudited" field could be added so
-                  '  you can review and manually flag excluded fields.
+                  ' Instead of hard-coding excluded fields, this step should be modified to add all fields.
+                  ' Then, an additional "IsAudited" field in the config table can be used to 
+                  '  review and manually flag excluded fields.
 250               For Each fld In tdef.Fields
-260                   If fld.Name <> "AccessTS" _
-                          And fld.Name <> "SSMA_TimeStamp" _
-                          And fld.Name <> "ValidFrom" _
-                          And fld.Name <> "ValidTo" Then
+260                  ' If fld.Name <> "AccessTS" _
+                     '     And fld.Name <> "SSMA_TimeStamp" _
+                     '     And fld.Name <> "ValidFrom" _
+                     '     And fld.Name <> "ValidTo" Then
                           
                           ' Check if this field is the primary key
 270                       isPK = (fld.Name = pkFieldName)
                           
-280                       strSQL = "INSERT INTO tblDataMacroConfig (TableName, FieldName, DataType, IsPrimaryKey) " & _
-                              "VALUES ('" & tdef.Name & "', '" & fld.Name & "', " & fld.type & ", " & isPK & ")"
+280                       strSQL = "INSERT INTO tblDataMacroConfig (TableName, FieldName, DataType, IsPrimaryKey, IsAuditable) " & _
+                              "VALUES ('" & tdef.Name & "', '" & fld.Name & "', " & fld.type & ", " & isPK & ", " & -1 & ")" 'default to IsAuditable = true
 290                       db.Execute strSQL
 300                   End If
 310               Next fld
@@ -958,6 +960,7 @@ Private Function GetPrimaryKeyField(tableName As String) As String
           
 200       GetPrimaryKeyField = ""
 End Function
+
 
 
 
