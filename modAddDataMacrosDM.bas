@@ -1,7 +1,4 @@
 Attribute VB_Name = "modAddDataMacrosDM"
-Option Compare Database
-Option Explicit
-
 '=====================================================================================================================
 ' COMPLETE AUDIT DATA MACRO SYSTEM
 '
@@ -11,12 +8,12 @@ Option Explicit
 '            The main audit table, tblAuditLog, must be created in the BE and MUST be linked to the FE for use in restoring records when required.
 '            The tblLongTextBackup table must be created in the BE and it MUST be linked to the FE
 '              because both the Data Macros in the BE and the VBA in the FE must have read/write access to this table.
-'             The tblDataMacroConfig table must be created in the BE and MUST be linked to the FE
+'             The tblAuditLogConfig table must be created in the BE and MUST be linked to the FE
 '              because both the Data Macros in the BE and the VBA in the FE must have read/write access to this table.
 
 ' SETUP INSTRUCTIONS:
 '  BACK END Set up
-' 1. Run CreateAuditTables() to create the 3 required tables- - tblAuditLog, tblLongTextBackup, and tblDataMacroConfig
+' 1. Run CreateAuditTables() to create the 3 required tables- - tblAuditLog, tblLongTextBackup, and tblAuditLogConfig
 ' 2. Run PopulateConfigTable() to populate the config with your auditable tables/fields
 ' 3. Run GenerateAllAuditDataMacros() to create all Data Macros
 '  FRONT END Set up
@@ -32,7 +29,7 @@ Public Sub One_CreateAuditTables()
       Dim db As DAO.Database
       Dim tdf As DAO.TableDef
       Dim fld As DAO.Field
-      Dim idx As DAO.index
+      Dim idx As DAO.Index
           
 110       Set db = CurrentDb
           
@@ -89,6 +86,8 @@ Public Sub One_CreateAuditTables()
           
 CreateLongTextBackup:
           ' ========== Create tblLongTextBackup ==========
+          'Optional, useful only when Long Text field data is <= ~2034 characters long and can be edited by VBA
+          
 490       Set tdf = Nothing
 500       On Error Resume Next
 510       Set tdf = db.TableDefs("tblLongTextBackup")
@@ -139,17 +138,17 @@ CreateLongTextBackup:
 850   Debug.Print "tblLongTextBackup created"
           
 CreateConfig:
-          ' ========== Create tblDataMacroConfig ==========
+          ' ========== Create tblAuditLogConfig ==========
 860       Set tdf = Nothing
 870       On Error Resume Next
-880       Set tdf = db.TableDefs("tblDataMacroConfig")
+880       Set tdf = db.TableDefs("tblAuditLogConfig")
 890       If Not tdf Is Nothing Then
-900   Debug.Print "tblDataMacroConfig already exists"
+900   Debug.Print "tblAuditLogConfig already exists"
 910           GoTo Cleanup
 920       End If
 930       On Error GoTo ErrorHandler
           
-940       Set tdf = db.CreateTableDef("tblDataMacroConfig")
+940       Set tdf = db.CreateTableDef("tblAuditLogConfig")
           
 950       Set fld = tdf.CreateField("ConfigID", dbLong)
 960       fld.Attributes = dbAutoIncrField
@@ -163,39 +162,48 @@ CreateConfig:
 1020      fld.Required = True
 1030      tdf.Fields.Append fld
           
-1040      Set fld = tdf.CreateField("DataType", dbLong)
+1040      Set fld = tdf.CreateField("FieldPosition", dbLong)
 1050      fld.Required = True
 1060      tdf.Fields.Append fld
           
-1070      Set fld = tdf.CreateField("IsPrimaryKey", dbBoolean)
+1070      Set fld = tdf.CreateField("DataType", dbLong)
 1080      fld.Required = True
-1090      fld.DefaultValue = "False"
-1100      tdf.Fields.Append fld
+1090      tdf.Fields.Append fld
           
-1110      db.TableDefs.Append tdf
+1100      Set fld = tdf.CreateField("IsPrimaryKey", dbBoolean)
+1110      fld.Required = True
+1120      fld.DefaultValue = "False"
+1130      tdf.Fields.Append fld
           
-1120      Set idx = tdf.CreateIndex("PrimaryKey")
-1130      idx.Primary = True
-1140      idx.Required = True
-1150      Set fld = idx.CreateField("ConfigID")
-1160      idx.Fields.Append fld
-1170      tdf.Indexes.Append idx
+1140      Set fld = tdf.CreateField("IsAuditable", dbBoolean)
+1150      fld.Required = True
+1160      fld.DefaultValue = "True"
+1170      tdf.Fields.Append fld
+1180      db.TableDefs.Append tdf
           
-1180  Debug.Print "tblDataMacroConfig created"
+1190      Set idx = tdf.CreateIndex("PrimaryKey")
+1200      idx.Primary = True
+1210      idx.Required = True
+1220      Set fld = idx.CreateField("ConfigID")
+1230      idx.Fields.Append fld
+1240      tdf.Indexes.Append idx
+          
+1250  Debug.Print "tblAuditLogConfig created"
           
 Cleanup:
-1190      Set fld = Nothing
-1200      Set idx = Nothing
-1210      Set tdf = Nothing
-1220      Set db = Nothing
+1260      Set fld = Nothing
+1270      Set idx = Nothing
+1280      Set tdf = Nothing
+1290      Set db = Nothing
           
-1230      MsgBox "Audit tables created successfully!", vbInformation
-1240      Exit Sub
+1300      MsgBox "Audit tables created successfully!", vbInformation
+1310      Exit Sub
           
 ErrorHandler: 'If desired, replace with your own Error Handling
-1250      MsgBox "Error creating tables: " & Err.Number & " - " & Err.Description, vbCritical
-1260      Resume Cleanup
+1320      MsgBox "Error creating tables: " & Err.Number & " - " & Err.Description, vbCritical
+1330      Resume Cleanup
 End Sub
+
 
 '-----------------------------------------------------------------------------
 ' STEP 2: Populate configuration table with your tables and fields
@@ -947,4 +955,5 @@ Private Function GetPrimaryKeyField(tableName As String) As String
           
 200       GetPrimaryKeyField = ""
 End Function
+
 
